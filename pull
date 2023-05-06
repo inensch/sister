@@ -1,0 +1,20 @@
+ # Trigger on push to the primary branches and all versioned tags
+  push:
+    branches:
+      - develop
+      - main
+    tags:
+      - 'v*'
+  # Trigger on pull request always (note the trailing colon)
+  pull_request:
+
+jobs:
+  # Test Vanilla Python (using PyPI for dependencies) as a matrix.
+  test_pypi:
+    runs-on: ${{ matrix.os }}
+    name: PyPi (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9]
+        os: [ubuntu-latest, macos-latest, windows-latest]
