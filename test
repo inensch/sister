@@ -1,0 +1,52 @@
+    - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Test OutlineAppleLib
+        run: npm run action cordova/test ios
+
+      - name: Build iOS Client
+        run: npm run action cordova/build ios
+
+      - uses: codecov/codecov-action@v3
+        with:
+          xcode: true
+          xcode_archive_path: ./output/coverage/apple/ios/TestResult.xcresult
+          flags: unittests, apple, ios
+
+  android_debug_build:
+    name: Android Debug Build
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    needs: web_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Install Java
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 11
+
+      - name: Setup Android
+        run: bash ./tools/build/setup_linux_android.sh
+
+      - name: Build Android Client
+        run: npm run action cordova/build android -- --verbose
